@@ -1,14 +1,14 @@
-## Go SDK
+# Go SDK
 
-### Installation
+## Installation
 
 To install the Go SDK, run:
 
-```
+```text
 go get -u -d github.com/ory/hydra/sdk/go/hydra
 ```
 
-### Configuration
+## Configuration
 
 The Go SDK is auto generated from swagger but contains some helpers, such as `NewSDK`:
 
@@ -23,7 +23,7 @@ sdk, err := hydra.NewSDK(&hydra.Configuration{
 })
 ```
 
-### API Usage
+## API Usage
 
 APIs usually have three return values. Please check for errors as well as status codes!
 
@@ -40,7 +40,7 @@ fmt.Printf("Policy created: %+v", policy)
 
 In rare cases, methods have only two return values. This happens when the REST API returns `204 No Content`:
 
-```
+```text
 response, err := sdk.DeletePolicy("policy-id")
 if err != nil {
     // This usually indicates a network error.
@@ -49,7 +49,7 @@ if err != nil {
 }
 ```
 
-### API Docs
+## API Docs
 
-API docs are available [here](https://github.com/ory/hydra/blob/master/sdk/go/hydra/swagger/README.md).
-Please note that those docs are generated and may introduce bugs if code examples are used 1:1.
+API docs are available [here](https://github.com/ory/hydra/blob/master/sdk/go/hydra/swagger/README.md). Please note that those docs are generated and may introduce bugs if code examples are used 1:1.
+

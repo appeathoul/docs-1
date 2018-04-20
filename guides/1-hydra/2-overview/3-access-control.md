@@ -1,17 +1,8 @@
 # Access Control
 
-OAuth 2.0 is a protocol that allows applications to act on a user's behalf,
-without knowing their credentials. While it offers a secure flow for applications
-(web apps, mobile apps, touchpoints, IoT) to gain access to your APIs,
-it does not specify what access rights users actually have.
-The frequent question "is the user actually allowed to access that resource?"
-is not answered by OAuth 2.0, nor by OpenID Connect.
+OAuth 2.0 is a protocol that allows applications to act on a user's behalf, without knowing their credentials. While it offers a secure flow for applications \(web apps, mobile apps, touchpoints, IoT\) to gain access to your APIs, it does not specify what access rights users actually have. The frequent question "is the user actually allowed to access that resource?" is not answered by OAuth 2.0, nor by OpenID Connect.
 
-For that reason, ORY Hydra offers something we call Access Control Policies.
-If you ever worked with Google Cloud IAM or AWS IAM, you probably know
-what these policies look like. Access Control Policies are a powerful tool
-capable of modeling simple and complex access control environments, such as
-simple read/write APIs or complex multi-tenant environments.
+For that reason, ORY Hydra offers something we call Access Control Policies. If you ever worked with Google Cloud IAM or AWS IAM, you probably know what these policies look like. Access Control Policies are a powerful tool capable of modeling simple and complex access control environments, such as simple read/write APIs or complex multi-tenant environments.
 
 The next sections give you an overview and best practices of these principles.
 
@@ -25,20 +16,22 @@ Using **Access Control Policies**, Hydra is able to answer the question:
 * **Able**: The effect which can be either "allow" or "deny".
 * **What**: An arbitrary action name, for example "delete", "create" or "scoped:action:something".
 * **Something**: An arbitrary unique resource name, for example "something", "resources.articles.1234" or some uniform
-    resource name like "urn:isbn:3827370191".
-* **Circumstance**: The circumstance under which the policy can be applied. Typically contains information about the
-    environment such as the IP Address, the time or date of access, or ownership. (optional)
 
-The evaluation logic follows these rules: 
+    resource name like "urn:isbn:3827370191".
+
+* **Circumstance**: The circumstance under which the policy can be applied. Typically contains information about the
+
+    environment such as the IP Address, the time or date of access, or ownership. \(optional\)
+
+The evaluation logic follows these rules:
 
 * By default, all requests are denied.
 * An explicit allow overrides this default.
 * An explicit deny overrides any allows.
 
-To decide whether access is allowed or not, ORY Hydra uses Access Control Policies represented as JSON. Values `actions`, `subjects`
-and `resources` can use regular expressions by encapsulating the expression in `<>`, for example `<.*>`.
+To decide whether access is allowed or not, ORY Hydra uses Access Control Policies represented as JSON. Values `actions`, `subjects` and `resources` can use regular expressions by encapsulating the expression in `<>`, for example `<.*>`.
 
-```json
+```javascript
 {
   "description": "One policy to rule them all.",
   "subjects": ["users:<[peter|ken]>", "users:maria", "groups:admins"],
@@ -61,7 +54,7 @@ and `resources` can use regular expressions by encapsulating the expression in `
 
 Now, Hydra is able to answer access requests like the following one:
 
-```json
+```javascript
 {
   "subject": "users:peter",
   "action" : "delete",
@@ -78,46 +71,37 @@ In this case, the access request will be allowed:
 2. `delete` matches `"actions" : ["delete", "<[create|update]>"]` as would `update` and `create`
 3. `resource:articles:ladon-introduction` matches `"resources": ["resources:articles:<.*>", "resources:printer"],`
 4. `"remoteIP": "192.168.0.5"` matches the [`CIDRCondition`](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
-condition that was configured for the field `remoteIP`.
+
+   condition that was configured for the field `remoteIP`.
 
 ## Warden API
 
-The warden is a HTTP API allowing you to perform access requests.
-The warden knows two endpoints:
+The warden is a HTTP API allowing you to perform access requests. The warden knows two endpoints:
 
 * `/warden/allowed`: Check if a subject is allowed to do something.
 * `/warden/token/allowed`: Check if the subject of a token is allowed to do something.
 
-Both endpoints use Access Control Policies as documented in the next sections to compute the result.
-The API endpoints are documented in the [HTTP API Documentation](http://docs.hydra13.apiary.io/#reference/warden:-access-control).
+Both endpoints use Access Control Policies as documented in the next sections to compute the result. The API endpoints are documented in the [HTTP API Documentation](http://docs.hydra13.apiary.io/#reference/warden:-access-control).
 
 ## Groups
 
-Subjects can be grouped together using the [Warden Group API](https://hydra13.docs.apiary.io/#reference/warden/wardengroups).
-This allows to create a set of groups (e.g. `admin`, `moderator`) with a specific set of policies attached to them.
-A subject (e.g. a human or a service) belonging to one or more groups inherits all policies attached to those groups.
+Subjects can be grouped together using the [Warden Group API](https://hydra13.docs.apiary.io/#reference/warden/wardengroups). This allows to create a set of groups \(e.g. `admin`, `moderator`\) with a specific set of policies attached to them. A subject \(e.g. a human or a service\) belonging to one or more groups inherits all policies attached to those groups.
 
 ## Best Practices
 
-This sections gives an overview of best practices for access control policies
-we developed over the years at ORY.
+This sections gives an overview of best practices for access control policies we developed over the years at ORY.
 
 ### Scalability
 
-Access Control Policies not using any regular expressions are quite scalable. Defining many regular expressions and
-a lot of policies (50.000+) may have a notable performance impact on CPU, your database and generally increase response
-times. This is because regular expressions can not be indexed. Regular expressions have a complexity of `O(n)` in Go,
-but that is still getting slow when you define too many.
+Access Control Policies not using any regular expressions are quite scalable. Defining many regular expressions and a lot of policies \(50.000+\) may have a notable performance impact on CPU, your database and generally increase response times. This is because regular expressions can not be indexed. Regular expressions have a complexity of `O(n)` in Go, but that is still getting slow when you define too many.
 
 Try to solve your access control definitions with a few generalized policies, and try to leverage Warden Groups.
 
 ### URNs
 
-> “There are only two hard things in Computer Science: cache invalidation and naming things.”
--- Phil Karlton
+> “There are only two hard things in Computer Science: cache invalidation and naming things.” -- Phil Karlton
 
-URN naming is as hard as naming API endpoints. Thankfully, by doing the latter, the former is usually solved as well.
-We will explore further best practices in the following sections.
+URN naming is as hard as naming API endpoints. Thankfully, by doing the latter, the former is usually solved as well. We will explore further best practices in the following sections.
 
 ### Scope the Organization Name
 
@@ -136,28 +120,23 @@ It is wise to scope actions, resources, and subjects in order to prevent name co
 
 ### Multi-Tenant Systems
 
-Multi-tenant systems typically have resources which should not be access by other tenants in the system. This can be
-achieved by adding the tenant id to the URN:
+Multi-tenant systems typically have resources which should not be access by other tenants in the system. This can be achieved by adding the tenant id to the URN:
 
 * **Do:** `resources:myorg.com:tenants:<tenant-id>:<resource-id>`
 
-In some environments, it is common to have organizations and projects belonging to those organizations. Here, the
-following URN semantics can be used:
+In some environments, it is common to have organizations and projects belonging to those organizations. Here, the following URN semantics can be used:
 
 * **Do:** `resources:myorg.com:organizations:<organization-id>:projects:<project-id>:<resource-id>`
 
 ## Conditions & Context
 
-Conditions are defined in policies. Contexts are defined in access control requests. Conditions use contexts and decide
-if a policy is responsible for handling the access request at hand.
+Conditions are defined in policies. Contexts are defined in access control requests. Conditions use contexts and decide if a policy is responsible for handling the access request at hand.
 
-Conditions are functions returning true or false given a context. Because conditions implement logic,
-they must be programmed. ORY Hydra uses conditions defined in [ORY Ladon](https://github.com/ory/ladon/#conditions).
-Adding new condition handlers must be done through creating a pull request in the ORY Ladon repository.
+Conditions are functions returning true or false given a context. Because conditions implement logic, they must be programmed. ORY Hydra uses conditions defined in [ORY Ladon](https://github.com/ory/ladon/#conditions). Adding new condition handlers must be done through creating a pull request in the ORY Ladon repository.
 
 A condition has always the same JSON format:
 
-```json
+```javascript
 {
   "subjects": ["..."],
   "actions" : ["..."],
@@ -174,10 +153,9 @@ A condition has always the same JSON format:
 }
 ```
 
-The context in the access request made to ORY Hydra's Warden API must match the specified key in the condition
-in order to be evaluated by the condition logic:
+The context in the access request made to ORY Hydra's Warden API must match the specified key in the condition in order to be evaluated by the condition logic:
 
-```json
+```javascript
 {
   "subject": "...",
   "action" : "...",
@@ -192,7 +170,7 @@ in order to be evaluated by the condition logic:
 
 The CIDR condition matches CIDR IP Ranges. An exemplary policy definition could look as follows.
 
-```json
+```javascript
 {
   "description": "One policy to rule them all.",
   "subjects": ["users:maria"],
@@ -212,7 +190,7 @@ The CIDR condition matches CIDR IP Ranges. An exemplary policy definition could 
 
 The following access request would be allowed.
 
-```json
+```javascript
 {
   "subject": "users:maria",
   "action" : "delete",
@@ -225,7 +203,7 @@ The following access request would be allowed.
 
 The next access request would be denied as the condition is not fulfilled and thus no policy is matched.
 
-```json
+```javascript
 {
   "subject": "users:maria",
   "action" : "delete",
@@ -238,7 +216,7 @@ The next access request would be denied as the condition is not fulfilled and th
 
 The next access request would also be denied as the context is not using the key `remoteIPAddress` but instead `someOtherKey`.
 
-```json
+```javascript
 {
   "subject": "users:maria",
   "action" : "delete",
@@ -253,7 +231,7 @@ The next access request would also be denied as the context is not using the key
 
 Checks if the value passed in the access request's context is identical with the string that was given initially.
 
-```json
+```javascript
 {
   "description": "One policy to rule them all.",
   "subjects": ["users:maria"],
@@ -273,7 +251,7 @@ Checks if the value passed in the access request's context is identical with the
 
 The following access request would be allowed.
 
-```json
+```javascript
 {
   "subject": "users:maria",
   "action" : "delete",
@@ -286,7 +264,7 @@ The following access request would be allowed.
 
 The following access request would be denied.
 
-```json
+```javascript
 {
   "subject": "users:maria",
   "action" : "delete",
@@ -301,7 +279,7 @@ The following access request would be denied.
 
 Checks if the value passed in the access request's context matches the regular expression that was given initially.
 
-```json
+```javascript
 {
   "description": "One policy to rule them all.",
   "subjects": ["users:maria"],
@@ -321,7 +299,7 @@ Checks if the value passed in the access request's context matches the regular e
 
 The following access request would be allowed.
 
-```json
+```javascript
 {
   "subject": "users:maria",
   "action" : "delete",
@@ -334,7 +312,7 @@ The following access request would be allowed.
 
 The following access request would be denied.
 
-```json
+```javascript
 {
   "subject": "users:maria",
   "action" : "delete",
@@ -349,7 +327,7 @@ The following access request would be denied.
 
 Checks if the access request's subject is identical with the string specified in the context.
 
-```json
+```javascript
 {
   "description": "One policy to rule them all.",
   "subjects": ["users:maria"],
@@ -367,7 +345,7 @@ Checks if the access request's subject is identical with the string specified in
 
 The following access request would be allowed.
 
-```json
+```javascript
 {
   "subject": "users:maria",
   "action" : "delete",
@@ -380,7 +358,7 @@ The following access request would be allowed.
 
 The following access request would be denied.
 
-```json
+```javascript
 {
   "subject": "users:maria",
   "action" : "delete",
@@ -397,7 +375,7 @@ This condition makes more sense when being used with access tokens where the sub
 
 Checks if the value passed in the access request's context contains two-element arrays and that both elements in each pair are equal.
 
-```json
+```javascript
 {
   "description": "One policy to rule them all.",
   "subjects": ["users:maria"],
@@ -415,7 +393,7 @@ Checks if the value passed in the access request's context contains two-element 
 
 The following access request would be allowed.
 
-```json
+```javascript
 {
   "subject": "users:maria",
   "action" : "delete",
@@ -431,7 +409,7 @@ The following access request would be allowed.
 
 The following access request would be denied.
 
-```json
+```javascript
 {
   "subject": "users:maria",
   "action" : "delete",
@@ -443,3 +421,4 @@ The following access request would be denied.
   }
 }
 ```
+

@@ -1,18 +1,18 @@
-## JavaScript SDK
+# JavaScript SDK
 
-### Installation
+## Installation
 
 To install the JavaScript SDK, run:
 
-```
+```text
 npm install --save ory-hydra-sdk
 ```
 
-### Configuration
+## Configuration
 
-#### Basic configuration
+### Basic configuration
 
-```js
+```javascript
 const Hydra = require('ory-hydra-sdk')
 
 // Set this to Hydra's URL
@@ -23,19 +23,17 @@ Hydra.ApiClient.instance.authentications.basic.username = 'client-id'
 Hydra.ApiClient.instance.authentications.basic.password = 'client-secret'
 ```
 
-#### OAuth2 configuration
+### OAuth2 configuration
 
-We need OAuth2 capabilities in order to make authorized API
-calls. This currently requires writing your own OAuth2 mechanism.
-Thankfully, libraries like `passport-js` and `simple-oauth2` exist.
+We need OAuth2 capabilities in order to make authorized API calls. This currently requires writing your own OAuth2 mechanism. Thankfully, libraries like `passport-js` and `simple-oauth2` exist.
 
 Here, we will use `simple-oauth2` to configure OAuth2.
 
-```sh
+```bash
 npm i --save simple-oauth2
 ```
 
-```js
+```javascript
 const Hydra = require('ory-hydra-sdk')
 
 // ... configuration from the previous section
@@ -75,15 +73,13 @@ const refreshToken = () => oauth2.clientCredentials
   })
 ```
 
-Of course, the `refreshToken` method can be improved. Read more
-on this topic [here](https://github.com/lelylan/simple-oauth2#access-token-object).
+Of course, the `refreshToken` method can be improved. Read more on this topic [here](https://github.com/lelylan/simple-oauth2#access-token-object).
 
-### API Usage
+## API Usage
 
-Let's use `refreshToken` to request a new access token and make
-an authorized API call:
+Let's use `refreshToken` to request a new access token and make an authorized API call:
 
-```js
+```javascript
 refreshToken().then(() => {
   // It is important to note that must not return `hydra.listOAuth2Clients`
   // directly inside a Promise, otherwise you will encounter the "superagent double callback bug".
@@ -105,8 +101,7 @@ refreshToken().then(() => {
 })
 ```
 
-### API Docs
+## API Docs
 
-API docs are available [here](https://github.com/ory/hydra/blob/master/sdk/js/hydra/swagger/README.md).
-Please note that those docs are generated and may introduce bugs if code examples are used 1:1. Especially
-the package name is not correct.
+API docs are available [here](https://github.com/ory/hydra/blob/master/sdk/js/hydra/swagger/README.md). Please note that those docs are generated and may introduce bugs if code examples are used 1:1. Especially the package name is not correct.
+

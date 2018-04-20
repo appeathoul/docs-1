@@ -1,24 +1,22 @@
-## PHP SDK
+# PHP SDK
 
-### Installation
+## Installation
 
 Installation is best done using [composer](https://getcomposer.org/)
 
-```
+```text
 composer require ory/hydra-sdk
 ```
 
 If your project doesn't already make use of composer, you will need to include the resulting `vendor/autoload.php` file.
 
-### Configuration
+## Configuration
 
-#### OAuth2 configuration
+### OAuth2 configuration
 
-We need OAuth2 capabilities in order to make authorized API calls. You can either write your own OAuth2 mechanism or
-use an existing one that has been preconfigured for use with Hydra. Here we use a modified version of the league OAuth2
-client that has had this work done for us.
+We need OAuth2 capabilities in order to make authorized API calls. You can either write your own OAuth2 mechanism or use an existing one that has been preconfigured for use with Hydra. Here we use a modified version of the league OAuth2 client that has had this work done for us.
 
-```sh
+```bash
 composer require tulip/oauth2-hydra
 ```
 
@@ -43,10 +41,9 @@ try {
 } catch (\Hydra\Oauth2\Provider\Exception\IdentityProviderException $e) {
     die("Failed to get an access token: " . $e->getMessage());
 }
-
 ```
 
-#### SDK configuration
+### SDK configuration
 
 Using `$accessToken` from the above steps, you may now use the Hydra SDK:
 
@@ -61,7 +58,7 @@ $config->setAccessToken($accessToken);
 $hydraApiClient = new \Hydra\SDK\ApiClient($config);
 ```
 
-### API Usage
+## API Usage
 
 There are several APIs made available, see [the full API docs](https://github.com/ory/hydra/blob/master/sdk/php/swagger/README.md) for a list of clients and methods.
 
@@ -79,3 +76,4 @@ try {
     die("Failed to get clients: ".$e->getMessage());
 }
 ```
+
